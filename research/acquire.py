@@ -161,8 +161,9 @@ def main():
     parser.add_argument("--end", type=date.fromisoformat, required=True)
     parser.add_argument("--root", type=Path, default=Path("data"))
     parser.add_argument("--workers", type=int, choices=[1, 2], default=2)
+    parser.add_argument("--inventory", type=Path, help="Saved official resource inventory for the historical interval")
     args = parser.parse_args()
-    inventory = fetch_inventory("ist-daten-v2")
+    inventory = json.loads(args.inventory.read_text()) if args.inventory else fetch_inventory("ist-daten-v2")
     save_json(args.root / "audit" / "inventory.json", inventory)
     selected = resources_for_dates(inventory, args.start, args.end)
     with ThreadPoolExecutor(max_workers=args.workers) as pool:

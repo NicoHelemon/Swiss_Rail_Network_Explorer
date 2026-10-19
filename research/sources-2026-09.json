@@ -1,0 +1,122 @@
+{
+  "snapshot_generated_at_utc": "2026-10-19T21:17:27.932970+00:00",
+  "dataset": {
+    "name": "ist-daten-v2",
+    "url": "https://data.opentransportdata.swiss/en/dataset/ist-daten-v2"
+  },
+  "resources": [
+    {
+      "id": "2aa700b9-51d0-4b9d-9428-d237c8684181",
+      "name": "2026-09-14_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/2aa700b9-51d0-4b9d-9428-d237c8684181/download/2026-09-14_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "fff373ff-d28d-442c-a587-25a290184bcd",
+      "name": "2026-09-15_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/fff373ff-d28d-442c-a587-25a290184bcd/download/2026-09-15_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "65fbe560-8932-4d82-8a52-a63d5b0bc2a8",
+      "name": "2026-09-16_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/65fbe560-8932-4d82-8a52-a63d5b0bc2a8/download/2026-09-16_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "6187fd19-11db-41fa-9141-a7a27d753c04",
+      "name": "2026-09-17_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/6187fd19-11db-41fa-9141-a7a27d753c04/download/2026-09-17_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "fdfe825f-5450-416a-813c-22b0fd7b1661",
+      "name": "2026-09-18_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/fdfe825f-5450-416a-813c-22b0fd7b1661/download/2026-09-18_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "d33c462e-c7de-44a8-83d4-5d78c6036997",
+      "name": "2026-09-19_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/d33c462e-c7de-44a8-83d4-5d78c6036997/download/2026-09-19_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "044b748d-a080-41fd-8054-d1335df29416",
+      "name": "2026-09-20_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/044b748d-a080-41fd-8054-d1335df29416/download/2026-09-20_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "87e8ca1f-f2a6-40ef-b242-0ced281ec9a6",
+      "name": "2026-09-21_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/87e8ca1f-f2a6-40ef-b242-0ced281ec9a6/download/2026-09-21_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "86cc3410-ec05-410f-832d-357658749700",
+      "name": "2026-09-22_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/86cc3410-ec05-410f-832d-357658749700/download/2026-09-22_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "8b7d95cc-86db-4132-a8fe-f17856606373",
+      "name": "2026-09-23_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/8b7d95cc-86db-4132-a8fe-f17856606373/download/2026-09-23_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "bdc335d5-1f51-4995-8b02-a3960f3164f1",
+      "name": "2026-09-24_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/bdc335d5-1f51-4995-8b02-a3960f3164f1/download/2026-09-24_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "dd0cb200-423c-439d-93aa-cc30a77b6827",
+      "name": "2026-09-25_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/dd0cb200-423c-439d-93aa-cc30a77b6827/download/2026-09-25_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "69ee4ca9-a0ae-4e12-9dfd-e681f2830d45",
+      "name": "2026-09-26_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/69ee4ca9-a0ae-4e12-9dfd-e681f2830d45/download/2026-09-26_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    },
+    {
+      "id": "b1889b2d-bc80-47c9-b5b7-462e83782f23",
+      "name": "2026-09-27_istdaten.csv",
+      "url": "https://data.opentransportdata.swiss/dataset/febff1f3-ee85-470a-9487-2d07f93457c1/resource/b1889b2d-bc80-47c9-b5b7-462e83782f23/download/2026-09-27_istdaten.csv",
+      "format": "CSV",
+      "size": null,
+      "hash": null
+    }
+  ],
+  "note": "Saved official catalogue resource identifiers, not a raw-data backup. Future endpoint availability is controlled by the publisher."
+}

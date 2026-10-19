@@ -128,6 +128,7 @@ def run(root=Path("data"), output=Path("public/lab-results.json")):
         "funnel": combined_funnel,
         "daily": [{"date": day["date"], "rail_rows": day["rail_rows"], "retained_pairs": day["retained_pairs"], "ambiguous_journeys": day["ambiguous_journeys_excluded"]} for day in quality],
         "status_combinations": pl.concat([pl.DataFrame(day["rail_status_combinations"]) for day in quality]).group_by("AN_PROGNOSE_STATUS", "AB_PROGNOSE_STATUS").agg(pl.col("len").sum()).sort("len", descending=True).to_dicts(),
+        "missing_values_in_rail_calls": {column: sum(day["missing_values_in_rail_calls"][column] for day in quality) for column in quality[0]["missing_values_in_rail_calls"]},
         "delay_bound_sensitivity": [{"absolute_delay_bound_minutes": bound, "retained_pairs": sum(next(row["retained_pairs"] for row in day["delay_bound_sensitivity"] if row["absolute_delay_bound_minutes"] == bound) for day in quality)} for bound in [60, 180, 720, None]],
     }
     arrival_bins = [-np.inf, -5, -2, -1, 0, 1, 2, 3, 5, 10, 20, 60, np.inf]
@@ -142,7 +143,7 @@ def run(root=Path("data"), output=Path("public/lab-results.json")):
         "breakdowns": {key: breakdown(frame, key) for key in ["category", "operator", "hour", "operating_date"]},
         "stations": stations, "segments": segments, "models": model_report,
         "journeys": journey_examples(frame, root, model_report),
-        "provenance": {"source": "https://data.opentransportdata.swiss/en/dataset/ist-daten-v2", "documentation": "https://opentransportdata.swiss/en/cookbook/historic-and-statistics-cookbook/actual-data/", "terms": "https://opentransportdata.swiss/en/terms-of-use/", "inputs": inputs, "config_sha256": sha256_file(config_path), "python": platform.python_version(), "versions": {package: importlib.metadata.version(package) for package in ["polars", "pyarrow", "numpy", "pandas", "scikit-learn", "scipy"]}, "command": "POLARS_MAX_THREADS=4 OMP_NUM_THREADS=4 python -m research.analyze"},
+        "provenance": {"source": "https://data.opentransportdata.swiss/en/dataset/ist-daten-v2", "documentation": "https://opentransportdata.swiss/en/cookbook/historic-and-statistics-cookbook/actual-data/", "terms": "https://opentransportdata.swiss/en/terms-of-use/", "inputs": inputs, "config_sha256": sha256_file(config_path), "code_sha256": {str(p): sha256_file(p) for p in [Path('research/acquire.py'), Path('research/prepare.py'), Path('research/model.py'), Path('research/analyze.py')]}, "python": platform.python_version(), "versions": {package: importlib.metadata.version(package) for package in ["polars", "pyarrow", "numpy", "pandas", "scikit-learn", "scipy"]}, "command": "POLARS_MAX_THREADS=4 OMP_NUM_THREADS=4 python -m research.analyze"},
     }
     # Disallow NaN/infinite values in the actual browser payload.
     output.parent.mkdir(parents=True, exist_ok=True)

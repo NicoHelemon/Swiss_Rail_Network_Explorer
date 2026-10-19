@@ -5,6 +5,16 @@
 [build.environment]
   NODE_VERSION = "24"
 
+[[redirects]]
+  from = "/v1"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/v1/*"
+  to = "/index.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]

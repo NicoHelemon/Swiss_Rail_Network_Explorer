@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import "./styles.css";
 import { stations, connections } from "./data/network.js";
 import {
   createGraph,

@@ -121,6 +121,9 @@ def fit_models(frame, config, root=Path("data")):
         "zero": np.zeros(partitions[name].height),
         "persistence": partitions[name]["departure_delay"].to_numpy(),
     } for name in matrices}
+    correction = float((targets["train"] - partitions["train"]["departure_delay"].to_numpy()).mean())
+    for split in predictions:
+        predictions[split]["bias_corrected_persistence"] = predictions[split]["persistence"] + correction
     training_seconds = {}
     for name, model in models.items():
         started = time.monotonic()
@@ -132,7 +135,8 @@ def fit_models(frame, config, root=Path("data")):
         print(f"Fitted {name} in {training_seconds[name]:.1f}s", flush=True)
     evaluation = {split: {name: metrics(targets[split], prediction) for name, prediction in candidates.items()} for split, candidates in predictions.items()}
     # Predeclared selection uses validation only; test metrics never select a model.
-    selected = min(evaluation["validation"], key=lambda name: evaluation["validation"][name]["mae"])
+    selection_candidates = ["zero", "persistence", "ridge", "hist_gradient_boosting"]
+    selected = min(selection_candidates, key=lambda name: evaluation["validation"][name]["mae"])
     test = partitions["test"]
     y = targets["test"]
     for name in evaluation["test"]:
@@ -151,6 +155,12 @@ def fit_models(frame, config, root=Path("data")):
                 name: metrics(y[mask], prediction[mask]) for name, prediction in predictions["test"].items()
             }})
         subset_results[dimension] = group_results
+    segment_labels = test.select(pl.concat_str("station", "next_station", separator=" → ").alias("segment"))["segment"]
+    subset_results["segment"] = []
+    top_segments = segment_labels.value_counts(sort=True).filter(pl.col("count") >= 500).head(15)
+    for value in top_segments["segment"]:
+        mask = segment_labels.eq(value).to_numpy()
+        subset_results["segment"].append({"value": value, "n": int(mask.sum()), "metrics": {name: metrics(y[mask], prediction[mask]) for name, prediction in predictions["test"].items()}})
     delay_bands = [(-np.inf, 0, "Early departure"), (0, 2, "0–2 min"), (2, 5, "2–5 min"), (5, 10, "5–10 min"), (10, np.inf, "10+ min")]
     subset_results["departure_delay"] = []
     departure = test["departure_delay"].to_numpy()
@@ -178,6 +188,8 @@ def fit_models(frame, config, root=Path("data")):
                 loss = mean_absolute_error(true, models[selected].predict(shuffled))
             importance.append({"feature": column, "mae_increase": float(loss - baseline), "sample_n": sample_n})
     unknowns = {column: int((~test[column].is_in(partitions["train"][column].unique())).sum()) for column in ["station_id", "next_station_id", "category", "operator"]}
+    train_segments = set(zip(partitions["train"]["station_id"], partitions["train"]["next_station_id"]))
+    unknowns["segment"] = sum(pair not in train_segments for pair in zip(test["station_id"], test["next_station_id"]))
     report = {
         "status": "evaluated", "interpretation": config["prediction_interpretation"],
         "features": FEATURES, "config": config, "splits": split_info,
@@ -185,9 +197,18 @@ def fit_models(frame, config, root=Path("data")):
         "training_seconds": training_seconds, "intervals": intervals,
         "subsets": subset_results, "error_histograms": error_histograms,
         "permutation_importance": importance, "unseen_test_values_row_counts": unknowns,
-        "test_evaluation_policy": "Fixed configurations; chosen model selected on validation MAE. Test reported once; no tuning on test.",
+        "test_evaluation_policy": "Original model configurations fixed before held-out evaluation; selected using validation MAE. No tuning on test. Subsequent diagnostic baseline and subgroup analyses are explicitly exploratory.",
+        "selection_candidates": selection_candidates,
+        "bias_correction_minutes": correction,
+        "additional_diagnostic": "Bias-corrected persistence was added after initial test inspection to distinguish model gains from a constant departure-to-arrival offset. The offset is fitted on training rows only; no test tuning. It did not select or change the original models.",
     }
     test_output = test.with_columns(*[pl.Series("prediction_" + name, prediction) for name, prediction in predictions["test"].items()])
+    report["failure_cases"] = test_output.with_columns(
+        (pl.col("prediction_" + selected) - pl.col("arrival_delay")).abs().alias("absolute_error"),
+    ).sort("absolute_error", descending=True).head(5).select(
+        "operating_date", "operator", "category", "station", "next_station", "departure_delay", "arrival_delay",
+        pl.col("prediction_" + selected).alias("prediction"), "absolute_error",
+    ).to_dicts()
     root = Path(root)
     test_output.write_parquet(root / "processed" / "test_predictions.parquet")
     save_json(root / "audit" / "model_results.json", report)

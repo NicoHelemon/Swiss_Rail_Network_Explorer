@@ -151,10 +151,11 @@ def prepare(path, root=Path("data")):
         raise ValueError("Parsed row count differs from the verified acquisition manifest")
     products = source.group_by("PRODUKT_ID").len().collect().to_dicts()
     rail = source.filter(pl.col("PRODUKT_ID") == "Zug").collect()
+    missingness = {column: rail[column].null_count() for column in REQUIRED}
     status_counts = rail.group_by("AN_PROGNOSE_STATUS", "AB_PROGNOSE_STATUS").len().sort("len", descending=True).to_dicts()
     operator_counts = rail.group_by("BETREIBER_ABK").len().sort("len", descending=True).to_dicts()
     pairs, quality = event_pairs(rail)
-    quality.update({"schema_version": SCHEMA_VERSION, "date": day, "source_rows": overview, "products": products, "rail_status_combinations": status_counts, "rail_operators": operator_counts, "input_sha256": manifest["sha256"]})
+    quality.update({"schema_version": SCHEMA_VERSION, "date": day, "source_rows": overview, "products": products, "rail_status_combinations": status_counts, "rail_operators": operator_counts, "missing_values_in_rail_calls": missingness, "input_sha256": manifest["sha256"]})
     (root / "processed").mkdir(parents=True, exist_ok=True)
     output = root / "processed" / f"{day}.parquet"
     pairs.write_parquet(output)
