@@ -1,6 +1,6 @@
 # Swiss Rail Network Explorer
 
-V2 research is being prepared as **Swiss Rail Delay Lab**. The official catalogue and documentation are accessible; CSV downloads redirect to an additional storage host whose cloud network access is pending. No observation files, real-data findings, or predictive results are available yet. The working V1 below remains unchanged. See [the feasibility checkpoint](docs/data_feasibility.md) and [provisional research protocol](docs/research_protocol.md). Source-audit parser tests: `python -m unittest research.test_audit_source`. These tests use synthetic fixtures and do not validate official records.
+V2 research is in progress as **Swiss Rail Delay Lab**, using genuine official Ist-Daten v2 rail records. Source acquisition is now paginated and verified after detecting truncated unbounded exports. A retrospective comparison was chosen explicitly; publication-time availability is not established. The working V1 remains unchanged until V2 results and its interface are validated. See [data feasibility](docs/data_feasibility.md) and [the protocol](docs/research_protocol.md).
 
 **Exploring connectivity through graph analysis.** An independent portfolio project by an EPFL MSc graduate interested in data science, graph theory, and railway planning. Not affiliated with SBB, EPFL, or any transport operator.
 

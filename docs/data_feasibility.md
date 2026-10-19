@@ -1,74 +1,80 @@
 # Ist-Daten v2 — feasibility assessment
 
-**Status: official catalogue/documentation inspected; raw-file access still blocked; prediction feasibility is not established.**
+**Decision: feasible for a qualified retrospective analysis of consecutive recorded rail calls. Not a validated as-of or real-time prediction experiment.**
 
-Assessment updated on 2026-10-19 after the initial network settings were applied. Official pages are now accessible. No official observation file has been downloaded or analyzed and no model has been fitted. Documentation examples are not treated as downloaded observations. V1 remains the main application and continues to label its network as synthetic. This document is a checkpoint, not a completed feasibility report.
+Updated on 2026-10-19 after reading the current official documentation and downloading actual records. The project author explicitly chose descriptive analysis plus a retrospective model comparison, accepting the publication-time limitation described below. No synthetic observations are included in the analytical dataset. V1 is preserved by the published `v1.0.0` tag.
 
-## What was actually verified
+## Sources actually inspected
 
-- The existing React/Vite project is committed at `7c056cf7ec7f3eaf2c711eb4a6de3bd3568dbd9e`. The published `v1.0.0` tag preserves that version. No application code or hosting configuration has been changed for V2.
-- Initially, requests were rejected before reaching the source (`CONNECT tunnel failed`, proxy HTTP 403). After the first three domains were enabled, the catalogue, current cookbook, terms, and resource-detail page returned HTTP 200. The public CKAN JSON API still returns an upstream HTTP 403; this must not be confused with the original network denial. The audit command can now use the public HTML catalogue instead, explicitly reporting the metadata format and missing fields.
-- The catalogue lists daily CSV resources from **2026-08-30 through 2026-10-18** at inspection time and states a daily update interval. It links an archive for earlier periods; archive contents and retention are not yet verified.
-- The catalogue warns of a production disruption on **2026-10-12**, with incorrect lines/missing line breaks. Avoid silently treating that day as ordinary data. A potential initial interval is 2026-09-14 through 2026-09-27, subject to actual file inspection, coverage, and quality checks.
-- The resource page for **2026-09-14** reports a **641.2 MB CSV**, data updated on 2026-09-15 at 05:11:40 +0200. This is metadata, not a locally verified file size. Resource ID: `2aa700b9-51d0-4b9d-9428-d237c8684181`. Do not download full weeks before testing small samples and a streaming approach.
-- A HEAD request to the official download URL returns HTTP 302 to **`83025b28472d6aa2bf5ae59f3724aa78.eu.r2.cloudflarestorage.com`**. Downloading the proposed first 2 MiB failed before any CSV bytes were saved. This newly discovered storage host has been added to the configuration draft alongside the original three domains; runtime access remains to be applied/tested. Signed download URLs expire after 60 seconds according to their redirect parameters; the stable catalogue URL should be used, and signed query parameters must not be persisted.
-- No Netlify deployment or deployed-site validation has been completed for V2. The existing `main` branch and V1 app remain unchanged.
+- [Ist-Daten v2 catalogue](https://data.opentransportdata.swiss/en/dataset/ist-daten-v2).
+- [Current cookbook, English](https://opentransportdata.swiss/en/cookbook/historic-and-statistics-cookbook/actual-data/) and its German counterpart.
+- [Official terms](https://opentransportdata.swiss/en/terms-of-use/).
+- [14 September 2026 resource detail](https://data.opentransportdata.swiss/en/dataset/ist-daten-v2/resource/2aa700b9-51d0-4b9d-9428-d237c8684181).
+- Actual CSV records obtained through the **public CSV datastore export linked on each official resource page**, with the documented CKAN filter `PRODUKT_ID=Zug`.
 
-## Official sources read
+GTFS, service-point reference data, weather, and any secondary dataset have not been used. Graph measures are not required for this research task.
 
-- [Ist-Daten v2](https://data.opentransportdata.swiss/en/dataset/ist-daten-v2)
-- [Dataset metadata API](https://data.opentransportdata.swiss/api/3/action/package_show?id=ist-daten-v2)
-- [Current actual-data cookbook](https://opentransportdata.swiss/en/cookbook/historic-and-statistics-cookbook/actual-data/) — English and German versions inspected.
-- [Official terms](https://opentransportdata.swiss/en/terms-of-use/) — file-based data requires no registration/payment, processed analyses may be published, source URL must be cited, and analysis authorship belongs to the data user. These are source-specific terms, not an assumed CC license. Resource metadata says “Reference Not Required”, while the general terms request attribution: cite both the source and applicable terms anyway. The terms also discuss regular raw-data updates; historical frozen analyses must be explicitly dated and must not masquerade as a current data service.
-- [2026-09-14 resource detail](https://data.opentransportdata.swiss/en/dataset/ist-daten-v2/resource/2aa700b9-51d0-4b9d-9428-d237c8684181)
+## Access, archive, and license
 
-GTFS and service-point datasets from the brief have not yet been inspected or used. No secondary copy or synthetic replacement has been used.
+The catalogue listed 50 daily resources covering 2026-08-30 through 2026-10-18 at inspection time, with daily updates. Earlier data is linked at `archive.opentransportdata.swiss`, but that archive's contents and retention were not verified. The chosen study interval is **2026-09-14 through 2026-09-27**, two complete operating weeks available in the current catalogue. It avoids the publisher's documented 2026-10-12 disruption (incorrect lines/missing line breaks).
 
-## Documented semantics and validity warnings
+The terms allow obtaining, processing, analyzing, and publishing file-based open data without registration/payment; analyses require source citation and the data user's authorship. This is a source-specific set of terms, not an assumed Creative Commons license. Resource metadata says reference is not required, whereas the general terms request attribution: this project cites the source and terms in either case. The terms also discuss regular raw-data updates. This project publishes an explicitly dated historical study, not a current/raw data service.
 
-The cookbook explicitly says daily files mix effective event times with the last forecast received; journeys without real-time information may be absent. Consequently, timestamps in a column named `AN_PROGNOSE` or `AB_PROGNOSE` are not automatically realized observations.
+Initial requests were blocked by the cloud egress policy. Catalogue/documentation access now works. The JSON metadata API still responds with an upstream HTTP 403, so `research.audit_source` records that response and reads the same resource links from the accessible public HTML catalogue. Missing metadata fields are not invented. Original uploaded CSV links redirect to an additional Cloudflare R2 hostname that remains blocked in the current runtime. No credential is inferred to be missing: file-based data is documented as public.
 
-The German schema lists raw status tokens `REAL` (effective event), `GESCHAETZT` (plausible estimated event), `PROGNOSE` or blank (forecast), and `UNBEKANNT` (no known forecast/event at this or preceding stops). The English page translates the latter tokens as ESTIMATED/FORECAST/UNKNOWN. Actual file tokens still need inspection; do not assume translated labels occur in the CSV. The cookbook explains that SBB/BLS/SOB normal-gauge records can contain control-system-derived estimates and latest forecasts. A REAL-only subset could therefore have substantial operator/route selection bias.
+### A real acquisition defect caught during validation
 
-The documented fields include operating date, journey reference, operator, product type, category/line text, cancellation/additional-service/pass-through flags, BPUIC, SLOID, and scheduled and forecast/event timestamps with their statuses. Scheduled times are minute-rounded, while event values may have seconds (or already be rounded by the operator). Full timestamp dates can differ from the operating date. The schema does **not document event publication timestamps, ingestion timestamps, revision history, or a stop-sequence index**. Journey ordering and information availability cannot be taken for granted.
+A large unbounded datastore export returned HTTP 200 and an apparently clean CSV EOF **before the source table ended**. For 2026-09-14 it contained 1,664,000 rows; a public descending-ID query showed the table continued through ID 2,647,493, and an offset query returned row 1,664,001. Many early exports ended on a 32,000-row boundary, the page size in the published CKAN 2.11.5 exporter. The underlying server-side reason is not established. Those partial exports and their derived artifacts were quarantined under ignored `data/*/unverified/` directories. Their preliminary statistics are superseded and are not used for final results.
 
-Version 2 explicitly allows foreign stops and 7-/9-digit BPUICs or SLOID-like identifiers. A later, evidently older section of the same cookbook still describes Swiss-only/truncated journeys. Treat the V2-specific notes as the current stated coverage, and test actual identifiers and journey boundaries; this documentation inconsistency must remain visible.
+The corrected acquisition requests **bounded pages of rail records only**, sorted by source `_id`. For each day it verifies:
 
-## Questions that must be resolved from documentation AND actual files
+1. Exact `PRODUKT_ID=Zug` and operating date in every record.
+2. A consistent schema and strictly increasing, nonoverlapping record IDs across pages.
+3. The highest filtered source ID before and after acquisition is unchanged and matches the final downloaded record.
+4. A query beyond the final downloaded row offset is empty.
+5. Source-page hashes, final CSV SHA-256, row counts, URLs, and retrieval time are saved. Cached files must pass their hashes before reuse.
 
-| Question | Evidence required | Current finding |
+This verifies the complete **public datastore rail subset as retrieved**. It does not establish byte equality or full equivalence to the publisher's original uploaded archive, nor does it establish coverage of every Swiss train. CSV normalization and the datastore `_id` field are disclosed. The corrected 2026-09-14 acquisition contains **179,471 rail-call rows**, rather than the 162,330 rail rows in the discarded partial export. After the declared cleaning rules it yields **129,626 eligible adjacent-call pairs**. The full interval's actual counts are generated, not extrapolated from this day.
+
+## Time and status semantics
+
+The cookbook says daily records can contain realized event times **or the last forecast received**; journeys without real-time information may be absent. A nonempty `AN_PROGNOSE` or `AB_PROGNOSE` is not automatically a realized observation.
+
+The actual file and German documentation use these tokens:
+
+| Raw status | Meaning | Main paired analysis |
 | --- | --- | --- |
-| Historical coverage and downloads | Resource inventory, dates, formats, sizes, update timestamps | Catalogue/resource pages inspected; file bodies pending |
-| License and attribution | Dataset-specific license and applicable terms | Terms and resource metadata read; source citation retained |
-| Scheduled versus observed timestamps | Field definitions and sampled records | Documentation distinguishes them; file-level quality unknown |
-| REAL / ESTIMATED / FORECAST / UNKNOWN | Exact official definitions, counts, missingness, examples | Documented definitions read; actual tokens/counts pending |
-| Prediction-time availability | Event publication/ingestion timestamps, revision policy, archival snapshot semantics | Not present in documented schema; critical limitation |
-| Rail-service identification | Official category/product definitions and sample values | Product field documented; actual values pending |
-| Journey identity | Documented identifiers scoped by operating date/operator as appropriate, collision audit | Journey reference documented; uniqueness needs data |
-| Successive stops | Reliable sequence field or demonstrably unambiguous ordering; gaps, loops, and duplicate events | No sequence field documented; reconstruction must be tested |
-| Station identity | Station/service-point identifiers and platform grouping semantics | V2 identifier variations documented; mappings untested |
-| Cancellations and non-commercial stops | Flags and treatment in archive | Flags documented; actual representation pending |
-| Overnight and DST events | Operating date versus actual calendar date; time-zone semantics | Full dates documented; explicit timezone/revision rules need verification |
-| Timetable revisions | Which scheduled times are preserved and when they became known | As-of schedule availability is not established |
+| `REAL` | Effective arrival/departure at a past call | Required for departure A and arrival B |
+| `GESCHAETZT` | Plausible estimated actual time | Excluded |
+| `PROGNOSE` or blank | Forecast | Excluded |
+| `UNBEKANNT` | No known forecast/event at this or preceding calls | Excluded |
 
-## Prediction feasibility gates
+The English documentation translates the latter three labels as ESTIMATED, FORECAST, and UNKNOWN. The pipeline retains the literal German source values. Status counts are audited rather than inferred from names. `REAL` is a producer classification, not an independent measurement calibration. Coverage can vary across operators and time.
 
-The proposed target is arrival delay at the next recorded, verified successive stop B, measured relative to the source's documented scheduled arrival. The prediction issue time would be the observed departure from stop A. Both the meaning of “observed” and the completeness of stop succession need evidence before this definition can be finalized.
+Scheduled arrival/departure timestamps are minute-rounded. Reported event times may contain seconds or already be rounded by the operator. The full dates are parsed independently of the operating date, so after-midnight calls are not forced onto the operating-day calendar date. Local times are interpreted as Europe/Zurich, consistent with the Swiss display context; the source schema does not explicitly establish timezone semantics for every foreign record. The analytical endpoint filter retains Swiss numeric station IDs; the selected September period has no Swiss DST transition. Ambiguous or nonexistent DST times become null and cannot silently enter valid pairs.
 
-1. **Measurement:** reliable realized departure A and arrival B can be distinguished from estimates, forecasts, missing values, and cancellations. Do not classify a value as realized just because a timestamp exists.
-2. **Sequence:** A and B belong to one journey and are successive eligible stops in an explicitly defined sequence. Do not drop invalid intermediate rows and silently join across them.
-3. **Timing:** departure A is no later than arrival B, with documented time-zone, operating-day, and overnight handling. Ties or inconsistent order must be audited, not arbitrarily resolved.
-4. **Information availability:** every feature must have been known at prediction issue time. A final daily archive may contain retrospectively corrected observations and forecasts. A final observed event timestamp alone does not establish when that value was published or revised.
-5. **Separation:** entire journeys belong to one chronological partition; all outcomes used in training must precede the validation issue period. Preprocessing and any historical aggregates must be fitted from training history only.
+## Journey reconstruction and exclusions
 
-If final observations are available but their as-of availability cannot be established, **do not advertise a deployment-realistic historical prediction experiment**. A clearly qualified retrospective conditional analysis may be possible, but that changes the interpretation and needs a user decision after the source is inspected. If reliable successive observations themselves cannot be reconstructed, prefer a narrower descriptive analysis. If observations cannot support even that, explain the limitation rather than publishing fabricated results.
+Journey identity is `(BETRIEBSTAG, BETREIBER_ID, FAHRT_BEZEICHNER)`. References are not treated as globally unique across dates. Operator and rail category fields come directly from the source. A rail filter does not include separately classified products such as `Zahnradbahn` or `Metro`; this scope is intentional.
 
-## Next executable steps
+There is **no explicit stop-sequence field**. Calls are ordered by scheduled arrival, falling back to scheduled departure when arrival is absent. Entire journeys with missing identity, missing order times, or tied planned ordering times are excluded. Identical duplicate payloads are removed; repeated station visits at different times are retained. The result is **consecutive recorded calls in planned-time order**, not verified physical track adjacency. No GTFS crosswalk independently establishes that all commercial calls are present.
 
-1. Apply the newly saved exact Cloudflare storage domain in environment settings; save and publish as requested by the product. Do not replace the three domains already working. Recheck the official download route after that state change.
-2. Run `python research/audit_source.py metadata --output data/audit/ist-daten-v2.json` to retain a compact inventory. It records the denied JSON API and obtains CSV links from the accessible public catalogue. Missing HTML metadata fields remain null rather than invented.
-3. Retrieve a small bounded prefix before any complete daily file. The current `sample` command downloads a whole resource up to a hard byte budget, so its default 64 MiB limit intentionally cannot download the 641.2 MB resource. Implement/test a bounded streaming sample and then complete-file streaming if justified; do not merely raise all budgets and fetch two weeks into memory.
-4. Inspect the actual header, timestamp/status values, cancellations, and journey sequences. Replace this provisional report with source-backed findings and measured quality counts.
-5. Select a reproducible complete historical interval (initially 14–28 days if suitable), establish the admissible prediction task, and proceed to the [research protocol](research_protocol.md).
+All candidate rail calls are sequenced **before** pair exclusions. Unreliable/cancelled/pass-through/foreign intermediate calls therefore cannot be removed and silently bridged. Eligible pairs require Swiss 7- or 9-digit numeric BPUIC endpoints, both endpoints not cancelled or pass-through, no contradictory REAL arrival/departure ordering within either call, REAL departure A and arrival B, all required timestamps, a positive scheduled segment, nonnegative realized running time, and different normalized station IDs. For documented 9-digit BPUICs the first seven digits identify the station; SLOID-only identifiers are not guessed into this mapping and are excluded/countable.
 
-No scientific phase is marked complete at this checkpoint. Neither source access nor prediction feasibility can be inferred from the presence of an audit script.
+The first inspected day exposed events almost 24 hours earlier than the timetable on three journeys. Dates are **not corrected or shifted**. A declared absolute-delay limit of 12 hours excludes such gross date inconsistencies. Sensitivity counts are retained at 60, 180, 720 minutes and without this limit. No negative delays are clipped to zero, and normal positive tails remain in the primary metrics. Every sequential exclusion has a before/excluded/retained count. Extreme examples are retained in the audit files.
+
+## Prediction task and information availability
+
+**Target:** REAL arrival delay at the next eligible consecutive recorded call B, in minutes relative to scheduled arrival. Candidate inputs include final REAL departure delay A, scheduled running time, station identities, category/operator, scheduled hour, and weekday.
+
+The documented and actual schema contains **no event publication timestamp, ingestion timestamp, revision history, or versioned as-of timetable**. Final event values do not prove what was available exactly at departure A. The daily file can also contain retrospectively corrected information. A strict operational historical backtest is therefore **not established** by this dataset alone.
+
+The accepted experiment is conditional and retrospective: do these final-record features predict final next-call delay on later operating days better than persistence? It is not a demonstration of real-time deployability. Training, preprocessing, and model selection use earlier data only. Whole journeys crossing the chronological boundaries are purged, including when realized outcomes cross midnight. No future realized running time, arrival B, or final whole-journey aggregate enters the feature whitelist.
+
+Fixed initial dates: train 14–21 September; validation 22–24 September; test 25–27 September 2026. Settings, metric definitions, bootstrap unit, and seed are recorded in `research/config.json` before held-out evaluation. These two weeks and three held-out days are too short to establish seasonal robustness. Journey-level uncertainty intervals do not fully capture shared day/route shocks.
+
+## Reproducibility and remaining limitations
+
+See [the research protocol](research_protocol.md), exact manifests under ignored `data/audit/`, the pinned Python requirements, and the final generated frontend output. Raw downloads and trained/full row-level artifacts are not committed. Preprocessing outputs carry both raw-input and Parquet hashes. Completeness of exported rail rows must not be confused with representativeness of national railway operations. Filtering REAL/REAL pairs, missing source journeys, conservative sequence exclusions, and omitted SLOID-only records can create selection bias. Station associations are not causal effects; a decrease in reported delay can reflect timetable allowances, timestamp conventions, or measurement differences rather than an identified operational mechanism.
+
+Model performance and full-period findings must be read from the generated results after actual evaluation. No performance is claimed by this feasibility report.

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "start": "2026-09-14",
+  "end": "2026-09-27",
+  "validation_start": "2026-09-22",
+  "test_start": "2026-09-25",
+  "seed": 2026,
+  "prediction_interpretation": "Retrospective conditional prediction from final REAL records; publication-time availability is not established. Approved by the project author on 2026-10-19.",
+  "maximum_absolute_delay_minutes": 720,
+  "change_tolerance_minutes": 1,
+  "ridge": { "alpha": 10, "solver": "lsqr", "tol": 0.0001 },
+  "hist_gradient_boosting": {
+    "max_iter": 150,
+    "max_leaf_nodes": 15,
+    "min_samples_leaf": 100,
+    "learning_rate": 0.05,
+    "l2_regularization": 10,
+    "max_bins": 128,
+    "early_stopping": false,
+    "random_state": 2026
+  },
+  "category_max_bins": 100,
+  "bootstrap_replicates": 500
+}
