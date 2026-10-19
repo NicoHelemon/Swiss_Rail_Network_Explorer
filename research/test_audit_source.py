@@ -6,13 +6,32 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 import zipfile
 
-from research.audit_source import get_bytes, inspect_csv, inspect_file, main, resource_inventory
+from research.audit_source import catalogue_inventory, fetch_inventory, get_bytes, inspect_csv, inspect_file, main, resource_inventory
 
 
 class AuditTests(unittest.TestCase):
+    def test_public_catalogue_fallback_preserves_source_and_missing_metadata(self):
+        html = b'<a href="https://data.opentransportdata.swiss/dataset/fixture/resource/r1/download/day.csv">Download</a>'
+        inventory = catalogue_inventory(html, "fixture")
+        self.assertEqual(inventory["resources"][0]["id"], "r1")
+        self.assertIsNone(inventory["resources"][0]["size"])
+        denied = HTTPError("https://example.org/api", 403, "Fixture denial", {}, None)
+        with patch("research.audit_source.get_bytes", side_effect=[denied, (html, "https://example.org/catalogue")]):
+            result = fetch_inventory("fixture")
+        self.assertEqual(result["api_attempt"]["http_status"], 403)
+        self.assertIn("Public HTML", result["inventory_format"])
+
+    def test_signed_redirect_parameters_are_not_saved(self):
+        class Response(io.BytesIO):
+            url = "https://example.org/day.csv?X-Amz-Signature=synthetic-fixture"
+            headers = {}
+        with patch("research.audit_source.urlopen", return_value=Response(b"123")):
+            _, resolved = get_bytes("https://example.org/download", 4)
+        self.assertEqual(resolved, "https://example.org/day.csv")
+
     def test_csv_tokens_and_missingness_are_literal(self):
         result = inspect_csv(io.StringIO("ID;EVENT_STATUS;VALUE\na;REAL;\nb;UNKNOWN;2\nc;FORECAST;3\n"))
         self.assertEqual(result["sample_rows"], 3)

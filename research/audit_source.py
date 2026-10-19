@@ -9,17 +9,19 @@ from collections import Counter
 import csv
 from datetime import datetime, timezone
 import hashlib
+from html.parser import HTMLParser
 import io
 import json
 from pathlib import Path
 import sys
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import quote, urlencode, urljoin, urlsplit
 from urllib.request import Request, urlopen
 import zipfile
 
 
 API = "https://data.opentransportdata.swiss/api/3/action/package_show"
+CATALOGUE = "https://data.opentransportdata.swiss/en/dataset/"
 USER_AGENT = "SwissRailDelayLab/0.1 (independent research source audit)"
 
 
@@ -36,7 +38,69 @@ def get_bytes(url, max_bytes):
         body = response.read(max_bytes + 1)
         if len(body) > max_bytes:
             raise ValueError("Source exceeds the configured byte budget")
-        return body, response.url
+        # Public download redirects use expiring signed URLs. Never persist their
+        # query parameters as provenance; retain the stable catalogue URL instead.
+        resolved = urlsplit(response.url)._replace(query="", fragment="").geturl()
+        return body, resolved
+
+
+class CatalogueLinks(HTMLParser):
+    """Read public CSV links when the public CKAN JSON endpoint is unavailable."""
+
+    def __init__(self):
+        super().__init__()
+        self.resources = {}
+
+    def handle_starttag(self, tag, attrs):
+        if tag != "a":
+            return
+        href = dict(attrs).get("href", "")
+        url = urljoin(CATALOGUE, href)
+        parsed = urlsplit(url)
+        parts = parsed.path.strip("/").split("/")
+        if (
+            parsed.scheme == "https"
+            and parsed.hostname == "data.opentransportdata.swiss"
+            and "resource" in parts and "download" in parts
+            and parts[-1].lower().endswith(".csv")
+        ):
+            index = parts.index("resource")
+            resource_id = parts[index + 1]
+            self.resources[resource_id] = {
+                "id": resource_id, "name": parts[-1], "url": url,
+                "format": "CSV", "size": None, "hash": None,
+            }
+
+
+def catalogue_inventory(body, dataset):
+    parser = CatalogueLinks()
+    parser.feed(body.decode("utf-8"))
+    if not parser.resources:
+        raise ValueError("No CSV resource links found; catalogue may have changed")
+    return {
+        "dataset": {"name": dataset, "url": CATALOGUE + quote(dataset, safe="")},
+        "resources": list(parser.resources.values()),
+        "inventory_format": "Public HTML catalogue; absent metadata is not inferred",
+    }
+
+
+def fetch_inventory(dataset):
+    api_url = API + "?" + urlencode({"id": dataset})
+    try:
+        body, _ = get_bytes(api_url, 16 * 1024**2)
+        return {**resource_inventory(body), "metadata_url": api_url, "inventory_format": "CKAN JSON"}
+    except HTTPError as error:
+        # The source currently serves its public pages but denies this API path.
+        # Use the same publicly linked resources, not an alternate/private copy.
+        if error.code not in (403, 404):
+            raise
+        catalogue_url = CATALOGUE + quote(dataset, safe="")
+        body, _ = get_bytes(catalogue_url, 16 * 1024**2)
+        return {
+            **catalogue_inventory(body, dataset), "metadata_url": catalogue_url,
+            "api_attempt": {"url": api_url, "http_status": error.code},
+            "metadata_sha256": hashlib.sha256(body).hexdigest(),
+        }
 
 
 def resource_inventory(body):
@@ -150,8 +214,7 @@ def main(argv=None):
             report["inspection"] = inspect_file(args.file, args.max_rows, args.max_expanded_mb * 1024**2)
         else:
             report["metadata_url"] = API + "?" + urlencode({"id": args.dataset})
-            body, _ = get_bytes(report["metadata_url"], 16 * 1024**2)
-            report.update(resource_inventory(body))
+            report.update(fetch_inventory(args.dataset))
             if args.command == "sample":
                 matches = [r for r in report["resources"] if r["id"] == args.resource_id]
                 if len(matches) != 1:
