@@ -1,5 +1,7 @@
 # Swiss Rail Network Explorer
 
+V2 research is being prepared as **Swiss Rail Delay Lab**. Official-source access is currently blocked by the cloud network policy; no real-data findings or predictive results are available yet. The working V1 below remains unchanged. See [the feasibility checkpoint](docs/data_feasibility.md) and [provisional research protocol](docs/research_protocol.md). Source-audit parser tests: `python -m unittest research.test_audit_source`. These tests use synthetic fixtures and do not validate official records.
+
 **Exploring connectivity through graph analysis.** An independent portfolio project by an EPFL MSc graduate interested in data science, graph theory, and railway planning. Not affiliated with SBB, EPFL, or any transport operator.
 
 A small, static React application: explore a schematic network, inspect station connectivity, and highlight minimum-edge paths. Built with Vite, React, D3 zoom/selection, and plain CSS. No backend, API key, authentication, or environment variables are required. Fonts are bundled locally; the application makes no external data requests.
