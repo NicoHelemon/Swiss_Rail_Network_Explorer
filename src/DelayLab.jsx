@@ -57,7 +57,7 @@ function Bars({
       ))}
       <details className="lab-values">
         <summary>Show chart values</summary>
-        <div className="lab-table-scroll">
+        <div className="lab-table-scroll" tabIndex={0}>
           <table>
             <thead>
               <tr>
@@ -167,7 +167,7 @@ function Comparison({ data }) {
       </p>
       <details>
         <summary>Group sample sizes</summary>
-        <div className="lab-table-scroll">
+        <div className="lab-table-scroll" tabIndex={0}>
           <table>
             <thead>
               <tr>
@@ -248,7 +248,7 @@ function Prediction({ data }) {
             </select>
           </label>
         </div>
-        <div className="lab-table-scroll">
+        <div className="lab-table-scroll" tabIndex={0}>
           <table className="lab-model-table">
             <caption>
               {split === "test"
@@ -402,7 +402,7 @@ function Prediction({ data }) {
             </select>
           </label>
         </div>
-        <div className="lab-table-scroll">
+        <div className="lab-table-scroll" tabIndex={0}>
           <table>
             <thead>
               <tr>
@@ -444,7 +444,7 @@ function Prediction({ data }) {
           inconsistencies as well as operational variation. No new exclusion was
           introduced after seeing these test errors.
         </p>
-        <div className="lab-table-scroll">
+        <div className="lab-table-scroll" tabIndex={0}>
           <table>
             <thead>
               <tr>
@@ -609,7 +609,7 @@ function Journey({ data }) {
       </div>
       <details>
         <summary>Scheduled times, REAL events and predictions</summary>
-        <div className="lab-table-scroll">
+        <div className="lab-table-scroll" tabIndex={0}>
           <table>
             <thead>
               <tr>
@@ -640,7 +640,7 @@ function Journey({ data }) {
       </details>
       <details>
         <summary>Original reported calls and statuses</summary>
-        <div className="lab-table-scroll">
+        <div className="lab-table-scroll" tabIndex={0}>
           <table>
             <thead>
               <tr>
@@ -973,7 +973,7 @@ export default function DelayLab() {
               retained population from the preceding row, so exclusions are not
               double-counted.
             </p>
-            <div className="lab-table-scroll">
+            <div className="lab-table-scroll" tabIndex={0}>
               <table>
                 <thead>
                   <tr>
@@ -1006,7 +1006,7 @@ export default function DelayLab() {
             </p>
             <details>
               <summary>Daily coverage and retained pairs</summary>
-              <div className="lab-table-scroll">
+              <div className="lab-table-scroll" tabIndex={0}>
                 <table>
                   <thead>
                     <tr>
@@ -1033,7 +1033,7 @@ export default function DelayLab() {
               <summary>
                 Literal arrival/departure status counts in rail exports
               </summary>
-              <div className="lab-table-scroll">
+              <div className="lab-table-scroll" tabIndex={0}>
                 <table>
                   <thead>
                     <tr>
@@ -1063,7 +1063,7 @@ export default function DelayLab() {
                 calls. Origins can legitimately have no arrival and termini no
                 departure; these counts are not all measurement failures.
               </p>
-              <div className="lab-table-scroll">
+              <div className="lab-table-scroll" tabIndex={0}>
                 <table>
                   <thead>
                     <tr>
